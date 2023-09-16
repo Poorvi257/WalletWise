@@ -2,17 +2,20 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mysql = require('mysql2/promise');
 const config = require('./config/config.json');
+const routes = require("./routes/index")
 
 const app = express();
 
 const createWalletTable = require('./migrations/Wallet');
 const createTransactionTable = require('./migrations/Transaction');
 
-app.use(bodyParser.json())  // Corrected
-app.use(bodyParser.urlencoded({ extended: true }))  // Corrected
+app.use(bodyParser.json())  
+app.use(bodyParser.urlencoded({ extended: true }))  
 
 const PORT = 8000
 const env = process.env.NODE_ENV || 'development';
+
+app.use('/', routes)
 
 app.listen(PORT, async () => {
     console.log(`Listening at ${PORT}`)

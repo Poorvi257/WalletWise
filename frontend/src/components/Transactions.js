@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, ToggleButton, ToggleButtonGroup, formControlClasses } from '@mui/material';
+import { TextField, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { walletTransaction, getWallet } from '../server';
 
 export const TransactionsForm = () => {
@@ -7,10 +7,10 @@ export const TransactionsForm = () => {
     const [amount, setAmount] = useState(0);
     const [desc, setDesc] = useState("");
     const [transactionType, setTransactionType] = useState("CREDIT");
-    const [showTransact, setShowTransact] = useState(false)
+    const [showTransact, setShowTransact] = useState(false);
     const walletId = localStorage.getItem("walletId");
     const [transaction, setTransaction] = useState({});
-
+    const [submittedTransaction, setSubmittedTransaction] = useState({});
 
     useEffect(() => {
         async function fetchData() {
@@ -22,14 +22,20 @@ export const TransactionsForm = () => {
 
     // Handle change for the amount input
     const handleAmountChange = (e) => {
-        setAmount(e.target.value);
-    };
-
-    const handleDescChange = (e) => {
-        if (e.target.value !== "" || e.target.value !== " ") {
-            setDesc(e.target.value);
+        const inputValue = e.target.value;
+        if (inputValue !== '' && Number(inputValue) > 0) {
+            setAmount(inputValue);
         }
     };
+
+    // Handle change for the description input
+    const handleDescChange = (e) => {
+        const inputValue = e.target.value;
+        if (inputValue.trim() !== "") {
+            setDesc(inputValue);
+        }
+    };
+
     // Handle change for the transaction type toggle
     const handleTypeChange = (e, newType) => {
         if (newType !== null) {
@@ -39,11 +45,32 @@ export const TransactionsForm = () => {
 
     // Handle the submit action
     const handleSubmit = async () => {
-        let resp = await walletTransaction(walletId, amount, desc, transactionType)
-        setTransaction(resp)
-        setShowTransact(true)
-        setAmount(0)
-        setDesc("")
+        let currentWalletState = await getWallet(walletId)
+        if (amount !== '' && Number(amount) <= 0) {
+            alert("Amount can't be 0 or negative");
+            setAmount(0)
+        }
+        else if (desc.trim() === "") {
+            alert("Description cannot be empty!");
+        }
+        else if (transactionType === "DEBIT" && currentWalletState.balance < amount) {
+            alert("You dont have enough funds for this transaction!")
+        }
+        else {
+            let resp = await walletTransaction(walletId, amount, desc, transactionType);
+            setTransaction(resp);
+            setShowTransact(true);
+            setSubmittedTransaction({
+                walletId,
+                amount,
+                transactionId: resp.transactionId,
+                desc,
+                balance: resp.balance,
+                transactionType
+            });
+        }
+        setAmount(0);
+        setDesc("");
     };
 
     return (
@@ -58,7 +85,6 @@ export const TransactionsForm = () => {
             />
             <TextField
                 label="Description"
-                type="string"
                 variant="outlined"
                 value={desc}
                 onChange={handleDescChange}
@@ -81,12 +107,12 @@ export const TransactionsForm = () => {
             </Button>
             {showTransact && <>
                 <ul>
-                    <li>{`WalletId: ${walletId}`}</li>
-                    <li>{`Amount: ${amount}`}</li>
-                    <li>{`transactionId: ${transaction.transactionId}`}</li>
-                    <li>{`Description: ${desc}`}</li>
-                    <li>{`Balance: ${transaction.balance}`}</li>
-                    <li>{`Transaction Type: ${transactionType}`}</li>
+                    <li>{`WalletId: ${submittedTransaction.walletId}`}</li>
+                    <li>{`Amount: ${submittedTransaction.amount}`}</li>
+                    <li>{`transactionId: ${submittedTransaction.transactionId}`}</li>
+                    <li>{`Description: ${submittedTransaction.desc}`}</li>
+                    <li>{`Balance: ${submittedTransaction.balance}`}</li>
+                    <li>{`Transaction Type: ${submittedTransaction.transactionType}`}</li>
                 </ul>
             </>}
         </div>

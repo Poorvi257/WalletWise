@@ -29,7 +29,7 @@ module.exports = {
       }
       
       const wallet = rows[0];
-      res.json({ id: wallet.id, balance: wallet.balance, name: wallet.name });
+      res.json({ id: wallet.id, balance: parseFloat(wallet.balance), name: wallet.name });
       
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch wallet details' });

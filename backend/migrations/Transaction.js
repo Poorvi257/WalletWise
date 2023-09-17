@@ -1,10 +1,8 @@
-const mysql = require('mysql2/promise');
+const pool = require('../db')
 
-async function createTransactionTable(config) {
-  let connection;
+async function createTransactionTable() {
+  const connection = await pool.getConnection();
   try {
-    connection = await mysql.createConnection(config);
-
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS Transactions (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -23,9 +21,7 @@ async function createTransactionTable(config) {
   } catch (err) {
     console.error('An error occurred while creating the table:', err);
   } finally {
-    if (connection) {
-      await connection.end();
-    }
+      await connection.release();
   }
 }
 

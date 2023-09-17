@@ -11,7 +11,6 @@ router.post("/setup", setup);
 router.post("/transact/:walletId", handleTransactions);
 
 // Fetch transactions related to a specific wallet
-// add the setup transaction
 router.get("/transactions", fetchTransactions);
 
 // Retrieve details of a specific wallet

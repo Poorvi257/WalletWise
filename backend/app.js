@@ -1,12 +1,14 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const routes = require("./routes/index");
+const cors = require('cors')
 const initDb = require('./database');
 
 const app = express();
 
 app.use(bodyParser.json())  
 app.use(bodyParser.urlencoded({ extended: true }))  
+app.use(cors())
 
 app.use('/', routes)
 

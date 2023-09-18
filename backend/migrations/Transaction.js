@@ -5,7 +5,7 @@ async function createTransactionTable() {
   try {
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS Transactions (
-        id INT PRIMARY KEY AUTO_INCREMENT,
+        id VARCHAR(50) PRIMARY KEY,
         wallet_id INT NOT NULL,
         amount DECIMAL(10, 4) NOT NULL,
         description VARCHAR(255) NULL,

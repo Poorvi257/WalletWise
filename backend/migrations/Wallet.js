@@ -5,7 +5,7 @@ async function createWalletTable(config) {
   try {
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS Wallet (
-        id VARCHAR(36) PRIMARY KEY,
+        id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(64) NULL,
         balance DECIMAL(15, 4) NOT NULL DEFAULT 20.0000,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -16,7 +16,7 @@ async function createWalletTable(config) {
   } catch (err) {
     console.error('An error occurred while creating the table:', err);
   } finally {
-      await connection.release();
+    await connection.release();
   }
 }
 

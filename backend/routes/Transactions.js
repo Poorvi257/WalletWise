@@ -1,5 +1,6 @@
 const pool = require('../db')
 const base64Url = require('base64-url');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
     async handleTransactions(req, res) {
@@ -25,9 +26,10 @@ module.exports = {
 
             await connection.query('UPDATE Wallet SET balance = ? WHERE id = ?', [Number.parseFloat(newBalance).toFixed(4), result.id]);
 
+            const id = uuidv4();
             let [resp] = await connection.query(
-                'INSERT INTO Transactions (wallet_id, amount, description, type, balance_after_transaction) VALUES (?, ?, ?, ?, ?)',
-                [result.id, amount, description, type, Number.parseFloat(newBalance).toFixed(4)]
+                'INSERT INTO Transactions (id, wallet_id, amount, description, type, balance_after_transaction) VALUES (?, ?, ?, ?, ?, ?)',
+                [id, result.id, amount, description, type, Number.parseFloat(newBalance).toFixed(4)]
             );
 
             const transactionId = resp.insertId;

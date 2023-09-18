@@ -56,10 +56,19 @@ export default function WalletTransactions() {
       
 
     const sortedTransactions = [...transactions].sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+        
+        // Convert to numbers if the key is 'amount' or 'balance_after_transaction'
+        if (['amount', 'balance_after_transaction'].includes(sortConfig.key)) {
+            aValue = parseFloat(aValue);
+            bValue = parseFloat(bValue);
+        }
+        
+        if (aValue < bValue) {
             return sortConfig.direction === 'asc' ? -1 : 1;
         }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
+        if (aValue > bValue) {
             return sortConfig.direction === 'asc' ? 1 : -1;
         }
         return 0;

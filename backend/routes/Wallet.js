@@ -7,13 +7,9 @@ module.exports = {
     try {
       const { name, balance } = req.body;
       
-      // Generate a new UUID
-      const id = uuidv4();
-      
-      await connection.query('INSERT INTO Wallet (id, name, balance) VALUES (?, ?, ?)', [id, name, balance]);
-      
+      const [rows] = await connection.query('INSERT INTO Wallet (name, balance) VALUES (?, ?)', [name, balance]);
       // Return the generated id
-      res.json({ id, balance, name });
+      res.json({ id: rows.insertId, balance, name });
   
     } catch (error) {
       res.status(500).json({ error: 'Failed to initialize wallet' });
@@ -27,7 +23,7 @@ module.exports = {
     try {
       const walletId = req.params.id;
       
-      const [rows] = await connection.query(`SELECT * FROM Wallet WHERE id=${walletId}`);
+      const [rows] = await connection.query('SELECT * FROM Wallet WHERE id=?', [walletId]);
       
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Wallet not found' });

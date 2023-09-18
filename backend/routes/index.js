@@ -1,6 +1,6 @@
 const express = require("express");
 const { setup, getWallet } = require("./Wallet");
-const { handleTransactions, fetchTransactions } = require("./Transactions");
+const { handleTransactions, fetchTransactions, fetchAllTransactions } = require("./Transactions");
 
 const router = express.Router();
 
@@ -12,6 +12,9 @@ router.post("/transact/:walletId", handleTransactions);
 
 // Fetch transactions related to a specific wallet
 router.get("/transactions", fetchTransactions);
+
+// Fetch all transactions related to a specific wallet
+router.get("/allTransactions/:walletId", fetchAllTransactions);
 
 // Retrieve details of a specific wallet
 router.get("/wallet/:id", getWallet);

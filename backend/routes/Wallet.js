@@ -1,15 +1,20 @@
 const pool = require('../db')
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   async setup(req, res) {
     const connection = await pool.getConnection();
     try {
       const { name, balance } = req.body;
-     
-      const [rows] = await connection.query('INSERT INTO Wallet (name, balance) VALUES (?, ?)', [name, balance]);
-     
-      res.json({ id: rows.insertId, balance, name });
-
+      
+      // Generate a new UUID
+      const id = uuidv4();
+      
+      await connection.query('INSERT INTO Wallet (id, name, balance) VALUES (?, ?, ?)', [id, name, balance]);
+      
+      // Return the generated id
+      res.json({ id, balance, name });
+  
     } catch (error) {
       res.status(500).json({ error: 'Failed to initialize wallet' });
     } finally {

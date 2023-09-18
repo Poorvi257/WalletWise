@@ -5,7 +5,7 @@ async function createWalletTable(config) {
   try {
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS Wallet (
-        id INT PRIMARY KEY AUTO_INCREMENT,
+        id VARCHAR(36) PRIMARY KEY,
         name VARCHAR(64) NULL,
         balance DECIMAL(15, 4) NOT NULL DEFAULT 20.0000,
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL

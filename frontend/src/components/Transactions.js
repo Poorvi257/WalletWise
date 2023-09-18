@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { TextField, Button, ToggleButton, ToggleButtonGroup, Avatar } from '@mui/material';
 import { walletTransaction, getWallet } from '../server';
+import { Link } from 'react-router-dom';
 
 export const TransactionsForm = () => {
 
@@ -45,7 +46,6 @@ export const TransactionsForm = () => {
 
     // Handle the submit action
     const handleSubmit = async () => {
-        let currentWalletState = await getWallet(walletId)
         if (amount !== '' && Number(amount) <= 0) {
             alert("Amount can't be 0 or negative");
             setAmount(0)
@@ -53,7 +53,7 @@ export const TransactionsForm = () => {
         else if (desc.trim() === "") {
             alert("Description cannot be empty!");
         }
-        else if (transactionType === "DEBIT" && currentWalletState.balance < amount) {
+        else if (transactionType === "DEBIT" && transaction.balance < amount) {
             alert("You dont have enough funds for this transaction!")
         }
         else {
@@ -75,7 +75,14 @@ export const TransactionsForm = () => {
 
     return (
         <div>
-            <div>{transaction ? transaction.balance : 'Loading...'}</div>
+            <div style={{ display: "flex" }}>
+                <Avatar>{transaction.name}</Avatar>
+                <span style={{ paddingTop: "1vh", paddingLeft: "1.5vw" }}>{transaction.name}</span>
+                <span style={{ marginLeft: "auto" }}>
+                    <Link to="/wallet-transactions">Go to Wallet Transactions</Link>
+                </span>
+            </div>
+            <div style={{padding: "2vh 1vw"}}>{transaction ? `Total Balance : ${transaction.balance || ""}` : 'Loading...'}</div>
             <TextField
                 label="Transaction Amount"
                 type="number"

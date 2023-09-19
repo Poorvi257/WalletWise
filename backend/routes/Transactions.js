@@ -11,15 +11,24 @@ module.exports = {
             const walletId = req.params.walletId;
             const { transactionId, amount, description, type } = req.body;
 
-            if (!walletId || isNaN(walletId) || !amount || isNaN(amount) || amount <= 0 || !description || !type || !['DEBIT', 'CREDIT'].includes(type)) {
-                return res.status(400).json({ error: 'Invalid input parameters. Amount must be positive and description cannot be empty.' });
+            if (!walletId || isNaN(walletId) || parseInt(walletId, 10) <= 0) {
+                return res.status(400).json({ error: 'Invalid wallet ID. Must be a positive integer.' });
             }
 
+            if (!amount || isNaN(amount) || amount <= 0 || !description || description.trim() === '' ||
+                !type || !['DEBIT', 'CREDIT'].includes(type)) {
+                return res.status(400).json({ error: 'Invalid input parameters. Amount must be positive, description cannot be empty, and transaction type must be either DEBIT or CREDIT.' });
+            }
             const [rows] = await connection.query('SELECT * FROM Wallet WHERE id=?', [walletId]);
             const wallet = rows.length > 0 ? rows[0] : null;
 
             if (!wallet) {
                 return res.status(404).json({ error: 'Wallet not found' });
+            }
+
+            if (isNaN(wallet.balance) || wallet.balance < 0) {
+                console.error(`Data integrity issue: Negative or NaN balance for wallet ID ${walletId}`);
+                return res.status(500).json({ error: 'Failed to process transaction due to data integrity issues' });
             }
 
             let newBalance = parseFloat(wallet.balance);

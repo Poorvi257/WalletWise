@@ -3,18 +3,34 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
   async setup(req, res) {
-    const connection = await pool.getConnection();
+    let connection;
     try {
+      connection = await pool.getConnection();
+
+      // Validate inputs
+      if (!req.body.name || !req.body.balance) {
+        return res.status(400).json({ error: 'Name and balance are required' });
+      }
+
       const { name, balance } = req.body;
-      
+
+      // Ensure balance is a number
+      if (isNaN(balance)) {
+        return res.status(400).json({ error: 'Balance must be a number' });
+      }
+
       const [rows] = await connection.query('INSERT INTO Wallet (name, balance) VALUES (?, ?)', [name, balance]);
+
       // Return the generated id
       res.json({ id: rows.insertId, balance, name });
-  
+
     } catch (error) {
+      console.error(`Failed to initialize wallet: ${error}`);
       res.status(500).json({ error: 'Failed to initialize wallet' });
     } finally {
-      connection.release();
+      if (connection) {
+        connection.release();
+      }
     }
   },
 

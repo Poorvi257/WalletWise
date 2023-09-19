@@ -12,8 +12,8 @@ export const getWallet = async (id) => {
     return res.data;
 };
 
-export const walletTransaction = async (id, amount, description, type) => {
-    const res = await axios.post(`${API_URL}transact/${id}`, { amount, description, type });
+export const walletTransaction = async (id, transactionId, amount, description, type) => {
+    const res = await axios.post(`${API_URL}transact/${id}`, { transactionId, amount, description, type });
     return res.data;
 };
 

@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { TextField, Button, ToggleButton, ToggleButtonGroup, Avatar } from '@mui/material';
 import { walletTransaction, getWallet } from '../server';
 import { Link } from 'react-router-dom';
+import { v4 as uuidv4 } from "uuid";
 
 export const TransactionsForm = () => {
 
-    const [amount, setAmount] = useState(0);
+    const [amount, setAmount] = useState("");
     const [desc, setDesc] = useState("");
     const [transactionType, setTransactionType] = useState("CREDIT");
     const [showTransact, setShowTransact] = useState(false);
     const walletId = localStorage.getItem("walletId");
     const [transaction, setTransaction] = useState({});
     const [submittedTransaction, setSubmittedTransaction] = useState({});
+    const transactionId = uuidv4();
 
     useEffect(() => {
         async function fetchData() {
@@ -24,17 +26,13 @@ export const TransactionsForm = () => {
     // Handle change for the amount input
     const handleAmountChange = (e) => {
         const inputValue = e.target.value;
-        if (inputValue !== '' && Number(inputValue) > 0) {
-            setAmount(inputValue);
-        }
+        setAmount(inputValue);
     };
 
     // Handle change for the description input
     const handleDescChange = (e) => {
         const inputValue = e.target.value;
-        if (inputValue.trim() !== "") {
-            setDesc(inputValue);
-        }
+        setDesc(inputValue);
     };
 
     // Handle change for the transaction type toggle
@@ -48,7 +46,11 @@ export const TransactionsForm = () => {
     const handleSubmit = async () => {
         if (amount !== '' && Number(amount) <= 0) {
             alert("Amount can't be 0 or negative");
-            setAmount(0)
+            setAmount("")
+        }
+        else if (amount === '') {
+            alert("Amount can't be 0 or negative");
+            setAmount("")
         }
         else if (desc.trim() === "") {
             alert("Description cannot be empty!");
@@ -57,19 +59,19 @@ export const TransactionsForm = () => {
             alert("You dont have enough funds for this transaction!")
         }
         else {
-            let resp = await walletTransaction(walletId, amount, desc, transactionType);
+            let resp = await walletTransaction(walletId, transactionId, amount, desc, transactionType);
             setTransaction(resp);
             setShowTransact(true);
             setSubmittedTransaction({
                 walletId,
                 amount,
-                transactionId: resp.transactionId,
+                transactionId,
                 desc,
                 balance: resp.balance,
                 transactionType
             });
         }
-        setAmount(0);
+        setAmount("");
         setDesc("");
     };
 
@@ -95,6 +97,7 @@ export const TransactionsForm = () => {
                 variant="outlined"
                 value={desc}
                 onChange={handleDescChange}
+                inputProps={{ maxLength: 50 }}
             />
             <ToggleButtonGroup
                 value={transactionType}

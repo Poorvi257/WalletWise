@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Button, Paper } from '@mui/material';
 import { Link } from 'react-router-dom';
+
+const apiBaseUrl = 'http://localhost:8000';
 
 export default function WalletTransactions() {
     const [transactions, setTransactions] = useState([]);
@@ -8,16 +10,16 @@ export default function WalletTransactions() {
     const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'asc' });
     const walletId = localStorage.getItem("walletId");
 
-    const fetchTransactions = async (link) => {
+    const fetchTransactions = useCallback(async (link) => {
         try {
-            const res = await fetch(link || `http://localhost:8000/transactions?walletId=${walletId}&limit=10`);
+            const res = await fetch(link || `${apiBaseUrl}/transactions?walletId=${walletId}&limit=10`);
             const data = await res.json();
             setTransactions(data.data.transactions);
             setLinks(data.links);
         } catch (error) {
             console.error("An error occurred while fetching data: ", error);
         }
-    };
+    }, [walletId]);
 
     const exportCSV = async () => {
         const headers = ['Amount', 'Description', 'Type', 'Balance After Transaction', 'Date'];
@@ -85,13 +87,13 @@ export default function WalletTransactions() {
 
     useEffect(() => {
         fetchTransactions();
-    }, []);
+    }, [fetchTransactions]);
 
     return (
-        <Paper>
-             <Link to="/">Back</Link>
-
-            <TableContainer style={{ marginBottom: "1vh" }}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+        <Link to="/">Back</Link>
+        <Paper style={{ flex: 1, overflowY: 'auto' }}>
+            <TableContainer>
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -133,5 +135,6 @@ export default function WalletTransactions() {
                 </Button>
             </div>
         </Paper>
+        </div>
     );
 }

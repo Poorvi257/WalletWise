@@ -90,11 +90,11 @@ export default function WalletTransactions() {
     }, [fetchTransactions]);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
+        <div>
         <Link to="/">Back</Link>
         <Paper style={{ flex: 1, overflowY: 'auto' }}>
-            <TableContainer>
-                <Table>
+            <TableContainer >
+                <Table stickyHeader>
                     <TableHead>
                         <TableRow>
                             <TableCell>

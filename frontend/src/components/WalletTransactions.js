@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Button, Paper } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
-const apiBaseUrl = 'http://65.1.100.208';
+const apiBaseUrl = 'http://65.1.100.208:8000';
 
 export default function WalletTransactions() {
     const [transactions, setTransactions] = useState([]);
@@ -35,7 +35,7 @@ export default function WalletTransactions() {
         const headers = ['Amount', 'Description', 'Type', 'Balance After Transaction', 'Date'];
 
         try {
-            const res = await fetch(`http://65.1.100.208/allTransactions/${walletId}`);
+            const res = await fetch(`http://65.1.100.208:8000/allTransactions/${walletId}`);
             const data = await res.json();
             const allTransactions = data  // Assuming the transactions are in data.data.transactions
 

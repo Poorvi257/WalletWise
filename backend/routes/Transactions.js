@@ -70,6 +70,10 @@ module.exports = {
                 return res.status(404).json({ error: 'No transactions found for this wallet' });
             }
 
+            rows.forEach((row) => {
+                row.created_at = new Date(row.created_at);
+            });
+
             res.json(rows);
 
         } catch (error) {
@@ -89,7 +93,7 @@ module.exports = {
             if (!connection) throw new HTTPError("Failed to establish a database connection.");
 
             const { walletId, page = 1, limit = 10, offset: currentOffset } = req.query;
-            if (!walletId) throw new HTTPError('Wallet ID must be provided.');
+            if (!walletId || isNaN(walletId)) throw new HTTPError('Invalid Wallet ID');
 
             const intPage = Number(page), intLimit = Number(limit);
             if (intPage < 1 || intLimit < 1 || intLimit > 1000) throw new HTTPError('Invalid page or limit.');

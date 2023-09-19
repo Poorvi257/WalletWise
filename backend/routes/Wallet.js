@@ -1,6 +1,4 @@
-const pool = require('../db')
-const { v4: uuidv4 } = require('uuid');
-
+const pool = require('../db');
 module.exports = {
   async setup(req, res) {
     let connection;
@@ -35,23 +33,32 @@ module.exports = {
   },
 
   async getWallet(req, res) {
-    const connection = await pool.getConnection();
+    let connection;
     try {
+      connection = await pool.getConnection();
+
+      // Validate walletId
       const walletId = req.params.id;
-      
+      if (!walletId || isNaN(walletId)) {
+        return res.status(400).json({ error: 'Invalid wallet ID' });
+      }
+
       const [rows] = await connection.query('SELECT * FROM Wallet WHERE id=?', [walletId]);
-      
+
       if (rows.length === 0) {
         return res.status(404).json({ error: 'Wallet not found' });
       }
-      
+
       const wallet = rows[0];
       res.json({ id: wallet.id, balance: parseFloat(wallet.balance), name: wallet.name });
-      
+
     } catch (error) {
+      console.error(`Failed to fetch wallet details: ${error}`);
       res.status(500).json({ error: 'Failed to fetch wallet details' });
     } finally {
-      connection.release();
+      if (connection) {
+        connection.release();
+      }
     }
   }
 };

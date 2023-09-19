@@ -11,8 +11,8 @@ module.exports = {
             const walletId = req.params.walletId;
             const { transactionId, amount, description, type } = req.body;
 
-            if (!walletId || isNaN(walletId) || !amount || isNaN(amount) || !type || !['DEBIT', 'CREDIT'].includes(type)) {
-                return res.status(400).json({ error: 'Invalid input parameters' });
+            if (!walletId || isNaN(walletId) || !amount || isNaN(amount) || amount <= 0 || !description || !type || !['DEBIT', 'CREDIT'].includes(type)) {
+                return res.status(400).json({ error: 'Invalid input parameters. Amount must be positive and description cannot be empty.' });
             }
 
             const [rows] = await connection.query('SELECT * FROM Wallet WHERE id=?', [walletId]);
@@ -60,16 +60,28 @@ module.exports = {
 
             // Validate walletId
             const walletId = req.params.walletId;
-            if (!walletId || isNaN(walletId)) {
-                return res.status(400).json({ error: 'Invalid wallet ID' });
+            if (!walletId || isNaN(walletId) || parseInt(walletId, 10) <= 0) {
+                return res.status(400).json({ error: 'Invalid wallet ID. Must be a positive integer.' });
             }
 
             const [rows] = await connection.query('SELECT * FROM Transactions WHERE wallet_id=? ORDER BY created_at DESC', [walletId]);
 
+            // Edge case: No transactions available for the wallet
             if (rows.length === 0) {
                 return res.status(404).json({ error: 'No transactions found for this wallet' });
             }
 
+            // Edge case: Validate that the timestamps and amounts are reasonable (data integrity check)
+            const invalidData = rows.some(row => {
+                return isNaN(new Date(row.created_at).getTime()) || isNaN(row.amount) || row.amount < 0;
+            });
+
+            if (invalidData) {
+                console.error(`Data integrity issue: Invalid timestamp or negative amount for wallet ID ${walletId}`);
+                return res.status(500).json({ error: 'Failed to fetch transactions due to data integrity issues' });
+            }
+
+            // Convert string timestamps from the database to JS Date objects
             rows.forEach((row) => {
                 row.created_at = new Date(row.created_at);
             });

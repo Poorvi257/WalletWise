@@ -5,23 +5,26 @@ module.exports = {
     try {
       connection = await pool.getConnection();
 
-      // Validate inputs
-      if (!req.body.name || !req.body.balance) {
-        return res.status(400).json({ error: 'Name and balance are required' });
-      }
-
       const { name, balance } = req.body;
 
-      // Ensure balance is a number
-      if (isNaN(balance)) {
-        return res.status(400).json({ error: 'Balance must be a number' });
+      // Validate inputs
+      if (!name || typeof name !== 'string' || name.trim() === '') {
+        return res.status(400).json({ error: "Name must be a non-empty string" });
       }
 
-      const [rows] = await connection.query('INSERT INTO Wallet (name, balance) VALUES (?, ?)', [name, balance]);
+      // Validate and set default balance
+      let validatedBalance = balance === undefined ? 100 : balance;
+      if (isNaN(validatedBalance) || validatedBalance < 0) {
+        return res.status(400).json({ error: "Balance must be a non-negative number" });
+      }
+
+      const [rows] = await connection.query(
+        "INSERT INTO Wallet (name, balance) VALUES (?, ?)",
+        [name, validatedBalance]
+      );
 
       // Return the generated id
-      res.json({ id: rows.insertId, balance, name });
-
+      res.json({ id: rows.insertId, balance: validatedBalance, name });
     } catch (error) {
       console.error(`Failed to initialize wallet: ${error}`);
       res.status(500).json({ error: 'Failed to initialize wallet' });
@@ -39,17 +42,24 @@ module.exports = {
 
       // Validate walletId
       const walletId = req.params.id;
-      if (!walletId || isNaN(walletId)) {
-        return res.status(400).json({ error: 'Invalid wallet ID' });
+      if (!walletId || isNaN(walletId) || parseInt(walletId, 10) <= 0) {
+        return res.status(400).json({ error: "Invalid wallet ID. Must be a positive integer." });
       }
 
-      const [rows] = await connection.query('SELECT * FROM Wallet WHERE id=?', [walletId]);
+      const [rows] = await connection.query("SELECT * FROM Wallet WHERE id=?", [walletId]);
 
       if (rows.length === 0) {
-        return res.status(404).json({ error: 'Wallet not found' });
+        return res.status(404).json({ error: "Wallet not found" });
       }
 
       const wallet = rows[0];
+
+      // Validate that the balance is a number and not negative (data integrity check)
+      if (isNaN(wallet.balance) || wallet.balance < 0) {
+        console.error(`Data integrity issue: Negative or NaN balance for wallet ID ${walletId}`);
+        return res.status(500).json({ error: "Failed to fetch wallet details due to data integrity issues" });
+      }
+
       res.json({ id: wallet.id, balance: parseFloat(wallet.balance), name: wallet.name });
 
     } catch (error) {

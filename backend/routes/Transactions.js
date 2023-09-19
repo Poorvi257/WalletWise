@@ -133,7 +133,7 @@ module.exports = {
 
             const prevContinuationToken = (offset - intLimit >= 0) ? offset - intLimit : null;
 
-            const baseLink = `http://localhost:8000/transactions?walletId=${walletId}&limit=${intLimit}`;
+            const baseLink = `http://65.1.100.208/transactions?walletId=${walletId}&limit=${intLimit}`;
             const selfLink = currentOffset ? `${baseLink}&offset=${currentOffset}` : `${baseLink}&page=${intPage}`;
             const nextLink = nextContinuationToken !== null ? `${baseLink}&offset=${base64Url.encode(JSON.stringify({ nextContinuationToken }))}` : undefined;
             const prevLink = prevContinuationToken !== null ? `${baseLink}&offset=${base64Url.encode(JSON.stringify({ nextContinuationToken: prevContinuationToken }))}` : undefined;

@@ -16,10 +16,31 @@ const LandingPage = () => {
     };
 
     const handleSubmit = async () => {
-        let response = await initializeWallet(formData.name, formData.balance)
-        localStorage.setItem("walletId", response.id)
-        alert("wallet created!")
-        setIsSubmitted(true)
+        if (!formData.name || formData.name.trim() === '') {
+            alert('Username cannot be empty.');
+            return;
+        }
+
+        if (formData.balance !== undefined && (isNaN(formData.balance) || formData.balance < 0)) {
+            alert('Balance must be a non-negative number.');
+            return;
+        }
+
+        try {
+            let response = await initializeWallet(formData.name, formData.balance);
+
+            // Check if response object contains status and error message
+            if (response.status && response.status === 400) {
+                alert(`Failed to initialize wallet: ${response.error}`);
+                return;
+            }
+
+            localStorage.setItem("walletId", response.id);
+            alert("Wallet created!");
+            setIsSubmitted(true);
+        } catch (error) {
+            alert(`An error occurred: ${error.message}`);
+        }
     };
 
     if (isSubmitted) {

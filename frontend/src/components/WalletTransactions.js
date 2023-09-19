@@ -18,7 +18,7 @@ export default function WalletTransactions() {
         } else {
             navigate('/');
         }
-    }, [walletId]);
+    }, [walletId, navigate]);
 
     const fetchTransactions = useCallback(async (link) => {
         try {

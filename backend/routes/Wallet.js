@@ -15,7 +15,7 @@ module.exports = {
       }
 
       // Validate and set default balance
-      let validatedBalance = balance === undefined ? 100 : balance;
+      let validatedBalance = balance === 0.0000 ? 100 : balance;
       if (isNaN(validatedBalance) || validatedBalance < 0) {
         return res.status(400).json({ error: "Balance must be a non-negative number" });
       }

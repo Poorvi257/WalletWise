@@ -15,10 +15,11 @@ module.exports = {
                 return res.status(400).json({ error: 'Invalid wallet ID. Must be a positive integer.' });
             }
 
-            if (!amount || isNaN(amount) || amount <= 0 || !description || description.trim() === '' ||
+            if (!transactionId || !amount || isNaN(amount) || amount <= 0 || !description || description.trim() === '' ||
                 !type || !['DEBIT', 'CREDIT'].includes(type)) {
                 return res.status(400).json({ error: 'Invalid input parameters. Amount must be positive, description cannot be empty, and transaction type must be either DEBIT or CREDIT.' });
             }
+
             const [rows] = await connection.query('SELECT * FROM Wallet WHERE id=?', [walletId]);
             const wallet = rows.length > 0 ? rows[0] : null;
 

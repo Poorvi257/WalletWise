@@ -18,6 +18,7 @@ The `handleTransactions` API function is an asynchronous endpoint responsible fo
 
 ### Request Parameters
 
+- **transactionId** (`number`): Transaction id.
 - **amount** (`number`): The amount of the transaction.
 - **description** (`string`, optional): A description or note for the transaction.
 - **type** (`string`): Type of the transaction, either 'DEBIT' or 'CREDIT'.

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, ToggleButton, ToggleButtonGroup, Avatar, Box, Typography, Container } from '@mui/material';
+import { TextField, Button, ToggleButton, ToggleButtonGroup, Avatar, Box, Typography, Container, TableContainer, Table, TableHead, TableRow, TableBody, TableCell } from '@mui/material';
 import { walletTransaction, getWallet } from '../server';
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from "uuid";
@@ -13,12 +13,14 @@ export const TransactionsForm = () => {
     const walletId = localStorage.getItem("walletId");
     const [transaction, setTransaction] = useState({});
     const [submittedTransaction, setSubmittedTransaction] = useState({});
+    const [name, setName] = useState("");
     const transactionId = uuidv4();
 
     useEffect(() => {
         async function fetchData() {
             const response = await getWallet(walletId);
             setTransaction(response);
+            setName(response.name);
         }
         fetchData();
     }, [walletId]);
@@ -80,8 +82,8 @@ export const TransactionsForm = () => {
             <Box style={{ minHeight: '100vh', padding: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar>{transaction.name ? transaction.name[0].toUpperCase() : ''}</Avatar>
-                        <Typography variant="h5" style={{ marginLeft: '1rem' }}>{transaction.name}</Typography>
+                        <Avatar>{name ? name[0].toUpperCase() : ''}</Avatar>
+                        <Typography variant="h5" style={{ marginLeft: '1rem' }}>{name}</Typography>
                     </div>
                     <div>
                         <Button variant="contained"
@@ -134,14 +136,29 @@ export const TransactionsForm = () => {
                     </div>
                     {showTransact && (
                         <Box sx={{ marginTop: '2rem' }}>
-                            <ul>
-                                <li>{`WalletId: ${submittedTransaction.walletId}`}</li>
-                                <li>{`Amount: ${submittedTransaction.amount}`}</li>
-                                <li>{`TransactionId: ${submittedTransaction.transactionId}`}</li>
-                                <li>{`Description: ${submittedTransaction.desc}`}</li>
-                                <li>{`Balance: ${submittedTransaction.balance}`}</li>
-                                <li>{`Transaction Type: ${submittedTransaction.transactionType}`}</li>
-                            </ul>
+                            <Typography variant="h5">Transaction Summary:</Typography>
+                            <TableContainer>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Amount</TableCell>
+                                            <TableCell>TransactionId</TableCell>
+                                            <TableCell>Description</TableCell>
+                                            <TableCell>Balance</TableCell>
+                                            <TableCell>Transaction Type</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell>{submittedTransaction.amount}</TableCell>
+                                            <TableCell>{submittedTransaction.transactionId}</TableCell>
+                                            <TableCell>{submittedTransaction.desc}</TableCell>
+                                            <TableCell>{submittedTransaction.balance}</TableCell>
+                                            <TableCell>{submittedTransaction.transactionType}</TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
                         </Box>
                     )}
                 </div>

@@ -29,7 +29,6 @@ const LandingPage = () => {
         try {
             let response = await initializeWallet(formData.name, formData.balance);
 
-            // Check if response object contains status and error message
             if (response.status && response.status === 400) {
                 alert(`Failed to initialize wallet: ${response.error}`);
                 return;
@@ -75,7 +74,7 @@ const LandingPage = () => {
                         onChange={handleChange}
                     />
 
-                    <Box style={{ marginTop: '20px' }}>  {/* Added space between the text field and the submit button */}
+                    <Box style={{ marginTop: '20px' }}>
                         <Button variant="contained" color="primary" onClick={handleSubmit}>
                             Submit
                         </Button>

@@ -37,7 +37,7 @@ export default function WalletTransactions() {
         try {
             const res = await fetch(`${apiBaseUrl}/allTransactions/${walletId}`);
             const data = await res.json();
-            const allTransactions = data  // Assuming the transactions are in data.data.transactions
+            const allTransactions = data 
 
             const rows = allTransactions.map(tx => [
                 tx.amount,
@@ -116,7 +116,7 @@ export default function WalletTransactions() {
                             <TableHead style={{ backgroundColor: '#F7F9FC' }}>
                                 <TableRow>
                                     <TableCell>Id</TableCell>
-                                    <TableCell style={{ width: '15%' }}> {/* Make "Amount" column larger */}
+                                    <TableCell style={{ width: '15%' }}> 
                                         Amount
                                         <TableSortLabel active={sortConfig.key === 'amount'} direction={sortConfig.direction} onClick={() => handleSort('amount')} />
                                     </TableCell>
@@ -131,7 +131,7 @@ export default function WalletTransactions() {
                             </TableHead>
                             <TableBody>
                                 {sortedTransactions.map((tx, index) => (
-                                    <TableRow key={index} style={{ backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7F9FC' }}> {/* Alternate colors */}
+                                    <TableRow key={index} style={{ backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7F9FC' }}>
                                         <TableCell>{tx.id}</TableCell>
                                         <TableCell>{tx.amount}</TableCell>
                                         <TableCell>{tx.description}</TableCell>

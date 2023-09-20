@@ -20,7 +20,7 @@ The Wallet API is designed to provide functionalities related to managing a digi
 
 ## Getting Started
 
-This API is built using Node.js and assumes that you have a basic understanding of RESTful API principles. The base URL for all endpoints is either set through an environment variable `BASE_URL` or defaults to `http://localhost:8000`.
+This API is built using Node.js and assumes that you have a basic understanding of RESTful API principles. The base URL for all endpoints is either set through an environment variable `API_URL` or defaults to `http://localhost:8000`.
 
 ## Authentication
 

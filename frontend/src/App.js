@@ -1,6 +1,6 @@
 import React from 'react';
 import Main from './components/Main';
-import WalletTransactions from './components/WalletTransactions'; // Make sure the path is correct
+import WalletTransactions from './components/WalletTransactions'; 
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 const App = () => {

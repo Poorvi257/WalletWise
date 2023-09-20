@@ -33,7 +33,6 @@ module.exports = {
         [transactionId, rows.insertId, validatedBalance, desc, type, validatedBalance]
       );
 
-      // Return the generated id
       res.json({ id: rows.insertId, balance: validatedBalance, name });
     } catch (error) {
       console.error(`Failed to initialize wallet: ${error}`);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography } from '@mui/material';
+import { Container, TextField, Button, Typography, Box } from '@mui/material';
 import { TransactionsForm } from './Transactions';
 import { initializeWallet } from '../server';
 
@@ -35,7 +35,7 @@ const LandingPage = () => {
                 return;
             }
 
-            localStorage.setItem("walletId", response.id);
+            localStorage.setItem("walletId", response.data.id);
             alert("Wallet created!");
             setIsSubmitted(true);
         } catch (error) {
@@ -49,36 +49,41 @@ const LandingPage = () => {
 
     return (
         <Container>
-            <Typography variant="h4" gutterBottom>
-                User Form
-            </Typography>
+            <Box style={{
+                minHeight: '100vh',
+            }}>
+                <Typography style={{ paddingTop: "7vh" }} variant="h4" gutterBottom>
+                    Create Wallet
+                </Typography>
 
-            <form>
-                <TextField
-                    label="Username"
-                    name='name'
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    onChange={handleChange}
-                />
+                <form>
+                    <TextField
+                        label="Username"
+                        name='name'
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        onChange={handleChange}
+                    />
 
-                <TextField
-                    label="Initial Balance (optional)"
-                    name='balance'
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    onChange={handleChange}
-                />
+                    <TextField
+                        label="Initial Balance (optional)"
+                        name='balance'
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        onChange={handleChange}
+                    />
 
-                <Button variant="contained" color="primary" onClick={handleSubmit}>
-                    Submit
-                </Button>
-            </form>
+                    <Box style={{ marginTop: '20px' }}>  {/* Added space between the text field and the submit button */}
+                        <Button variant="contained" color="primary" onClick={handleSubmit}>
+                            Submit
+                        </Button>
+                    </Box>
+                </form>
+            </Box>
         </Container>
     );
 };
 
 export default LandingPage;
-

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, ToggleButton, ToggleButtonGroup, Avatar } from '@mui/material';
+import { TextField, Button, ToggleButton, ToggleButtonGroup, Avatar, Box, Typography, Container } from '@mui/material';
 import { walletTransaction, getWallet } from '../server';
 import { Link } from 'react-router-dom';
 import { v4 as uuidv4 } from "uuid";
@@ -76,55 +76,76 @@ export const TransactionsForm = () => {
     };
 
     return (
-        <div>
-            <div style={{ display: "flex" }}>
-                <Avatar>{transaction.name}</Avatar>
-                <span style={{ paddingTop: "1vh", paddingLeft: "1.5vw" }}>{transaction.name}</span>
-                <span style={{ marginLeft: "auto" }}>
-                    <Link to="/wallet-transactions">Go to Wallet Transactions</Link>
-                </span>
-            </div>
-            <div style={{padding: "2vh 1vw"}}>{transaction ? `Total Balance : ${transaction.balance || ""}` : 'Loading...'}</div>
-            <TextField
-                label="Transaction Amount"
-                type="number"
-                variant="outlined"
-                value={amount}
-                onChange={handleAmountChange}
-            />
-            <TextField
-                label="Description"
-                variant="outlined"
-                value={desc}
-                onChange={handleDescChange}
-                inputProps={{ maxLength: 50 }}
-            />
-            <ToggleButtonGroup
-                value={transactionType}
-                exclusive
-                onChange={handleTypeChange}
-            >
-                <ToggleButton value="CREDIT">Credit</ToggleButton>
-                <ToggleButton value="DEBIT">Debit</ToggleButton>
-            </ToggleButtonGroup>
+        <Container>
+            <Box style={{ minHeight: '100vh', padding: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Avatar>{transaction.name ? transaction.name[0].toUpperCase() : ''}</Avatar>
+                        <Typography variant="h5" style={{ marginLeft: '1rem' }}>{transaction.name}</Typography>
+                    </div>
+                    <div>
+                        <Button variant="contained"
+                            color="primary">
+                            <Link to="/wallet-transactions" style={{ textDecoration: 'none', color: 'inherit' }}> Wallet Transactions</Link>
+                        </Button>
+                    </div>
+                </div>
+                <div style={{ paddingTop: "6vh" }}>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                        {transaction ? `Total Balance: $${transaction.balance || 0}` : 'Loading...'}
+                    </Typography>
 
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-            >
-                Submit
-            </Button>
-            {showTransact && <>
-                <ul>
-                    <li>{`WalletId: ${submittedTransaction.walletId}`}</li>
-                    <li>{`Amount: ${submittedTransaction.amount}`}</li>
-                    <li>{`transactionId: ${submittedTransaction.transactionId}`}</li>
-                    <li>{`Description: ${submittedTransaction.desc}`}</li>
-                    <li>{`Balance: ${submittedTransaction.balance}`}</li>
-                    <li>{`Transaction Type: ${submittedTransaction.transactionType}`}</li>
-                </ul>
-            </>}
-        </div>
+                    <TextField
+                        sx={{ marginBottom: '1rem' }}
+                        label="Transaction Amount"
+                        type="number"
+                        variant="outlined"
+                        fullWidth
+                        value={amount}
+                        onChange={handleAmountChange}
+                    />
+                    <TextField
+                        sx={{ marginBottom: '1rem' }}
+                        label="Description"
+                        variant="outlined"
+                        fullWidth
+                        value={desc}
+                        onChange={handleDescChange}
+                        inputProps={{ maxLength: 50 }}
+                    />
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <ToggleButtonGroup
+                            value={transactionType}
+                            exclusive
+                            onChange={handleTypeChange}
+                            sx={{ marginBottom: '1rem' }}
+                        >
+                            <ToggleButton value="CREDIT">Credit</ToggleButton>
+                            <ToggleButton value="DEBIT">Debit</ToggleButton>
+                        </ToggleButtonGroup>
+
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleSubmit}
+                        >
+                            Submit
+                        </Button>
+                    </div>
+                    {showTransact && (
+                        <Box sx={{ marginTop: '2rem' }}>
+                            <ul>
+                                <li>{`WalletId: ${submittedTransaction.walletId}`}</li>
+                                <li>{`Amount: ${submittedTransaction.amount}`}</li>
+                                <li>{`TransactionId: ${submittedTransaction.transactionId}`}</li>
+                                <li>{`Description: ${submittedTransaction.desc}`}</li>
+                                <li>{`Balance: ${submittedTransaction.balance}`}</li>
+                                <li>{`Transaction Type: ${submittedTransaction.transactionType}`}</li>
+                            </ul>
+                        </Box>
+                    )}
+                </div>
+            </Box>
+        </Container>
     );
 };

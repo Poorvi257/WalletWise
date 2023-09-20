@@ -113,30 +113,30 @@ module.exports = {
             connection = await pool.getConnection();
             if (!connection) throw new HTTPError("Failed to establish a database connection.");
 
-            const { walletId, page = 1, limit = 10, offset: currentOffset } = req.query;
+            const { walletId, page = 1, limit = 10, skip: currentOffset } = req.query;
             if (!walletId || isNaN(walletId)) throw new HTTPError('Invalid Wallet ID');
 
             const intPage = Number(page), intLimit = Number(limit);
             if (intPage < 1 || intLimit < 1 || intLimit > 1000) throw new HTTPError('Invalid page or limit.');
 
             const userOffset = currentOffset ? JSON.parse(base64Url.decode(currentOffset)) : undefined;
-            const offset = userOffset?.nextContinuationToken || (intPage - 1) * intLimit;
+            const skip = userOffset?.nextContinuationToken || (intPage - 1) * intLimit;
 
-            const [transactions] = await connection.query('SELECT * FROM Transactions WHERE wallet_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [walletId, intLimit + 1, offset]);
+            const [transactions] = await connection.query('SELECT * FROM Transactions WHERE wallet_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?', [walletId, intLimit + 1, skip]);
 
             let nextContinuationToken = null;
 
             if (transactions.length > intLimit) {
-                nextContinuationToken = offset + intLimit;
+                nextContinuationToken = skip + intLimit;
                 transactions.pop();
             }
 
-            const prevContinuationToken = (offset - intLimit >= 0) ? offset - intLimit : null;
+            const prevContinuationToken = (skip - intLimit >= 0) ? skip - intLimit : null;
 
-            const baseLink = `http://65.1.100.208:8000/transactions?walletId=${walletId}&limit=${intLimit}`;
-            const selfLink = currentOffset ? `${baseLink}&offset=${currentOffset}` : `${baseLink}&page=${intPage}`;
-            const nextLink = nextContinuationToken !== null ? `${baseLink}&offset=${base64Url.encode(JSON.stringify({ nextContinuationToken }))}` : undefined;
-            const prevLink = prevContinuationToken !== null ? `${baseLink}&offset=${base64Url.encode(JSON.stringify({ nextContinuationToken: prevContinuationToken }))}` : undefined;
+            const baseLink = `http://localhost:8000/transactions?walletId=${walletId}&limit=${intLimit}`;
+            const selfLink = currentOffset ? `${baseLink}&skip=${currentOffset}` : `${baseLink}&page=${intPage}`;
+            const nextLink = nextContinuationToken !== null ? `${baseLink}&skip=${base64Url.encode(JSON.stringify({ nextContinuationToken }))}` : undefined;
+            const prevLink = prevContinuationToken !== null ? `${baseLink}&skip=${base64Url.encode(JSON.stringify({ nextContinuationToken: prevContinuationToken }))}` : undefined;
 
             res.json({
                 links: { self: selfLink, next: nextLink, prev: prevLink },

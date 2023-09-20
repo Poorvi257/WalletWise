@@ -1,4 +1,6 @@
 const pool = require('../db');
+const { v4: uuidv4 } = require('uuid');
+
 module.exports = {
   async setup(req, res) {
     let connection;
@@ -21,6 +23,14 @@ module.exports = {
       const [rows] = await connection.query(
         "INSERT INTO Wallet (name, balance) VALUES (?, ?)",
         [name, validatedBalance]
+      );
+
+      const transactionId = uuidv4();
+      const desc = "Opening Balance"
+      const type = "CREDIT"
+      await connection.query(
+        'INSERT INTO Transactions (id, wallet_id, amount, description, type, balance_after_transaction) VALUES (?, ?, ?, ?, ?, ?)',
+        [transactionId, rows.insertId, validatedBalance, desc, type, validatedBalance]
       );
 
       // Return the generated id
@@ -60,7 +70,7 @@ module.exports = {
         return res.status(500).json({ error: "Failed to fetch wallet details due to data integrity issues" });
       }
 
-      res.json({ id: wallet.id, balance: parseFloat(wallet.balance), name: wallet.name });
+      res.json({ id: wallet.id, balance: parseFloat(wallet.balance), name: wallet.name, date: wallet.created_at });
 
     } catch (error) {
       console.error(`Failed to fetch wallet details: ${error}`);

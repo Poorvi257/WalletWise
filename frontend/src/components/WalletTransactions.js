@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Button, Paper } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Button, Paper } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
-const apiBaseUrl = 'http://65.1.100.208:8000';
+const apiBaseUrl = 'http://localhost:8000';
 
 export default function WalletTransactions() {
     const [transactions, setTransactions] = useState([]);
@@ -35,7 +35,7 @@ export default function WalletTransactions() {
         const headers = ['Amount', 'Description', 'Type', 'Balance After Transaction', 'Date'];
 
         try {
-            const res = await fetch(`http://65.1.100.208:8000/allTransactions/${walletId}`);
+            const res = await fetch(`http://localhost:8000/allTransactions/${walletId}`);
             const data = await res.json();
             const allTransactions = data  // Assuming the transactions are in data.data.transactions
 
@@ -100,51 +100,62 @@ export default function WalletTransactions() {
     }, [fetchTransactions]);
 
     return (
-        <div>
-            <Link to="/">Back</Link>
-            <Paper style={{ flex: 1, overflowY: 'auto' }}>
-                <TableContainer >
-                    <Table stickyHeader>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>
-                                    Amount
-                                    <TableSortLabel active={sortConfig.key === 'amount'} direction={sortConfig.direction} onClick={() => handleSort('amount')} />
-                                </TableCell>
-                                <TableCell>Description</TableCell>
-                                <TableCell>Type</TableCell>
-                                <TableCell>Balance After Transaction</TableCell>
-                                <TableCell>
-                                    Date
-                                    <TableSortLabel active={sortConfig.key === 'created_at'} direction={sortConfig.direction} onClick={() => handleSort('created_at')} />
-                                </TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {sortedTransactions.map((tx, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{tx.amount}</TableCell>
-                                    <TableCell>{tx.description}</TableCell>
-                                    <TableCell>{tx.type}</TableCell>
-                                    <TableCell>{tx.balance_after_transaction}</TableCell>
-                                    <TableCell>{new Date(tx.created_at).toLocaleString()}</TableCell>
+        <Box style={{
+            minHeight: '100vh',
+        }}>
+            <div style={{ paddingTop: "3vh", textAlign: 'center' }}>
+                <Button variant="contained" color="primary">
+                    <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>Back</Link>
+                </Button>
+            </div>
+
+            <div style={{ paddingTop: "3vh", backgroundColor: '#FFFFFF', borderRadius: '8px', margin: '1em' }}>
+                <Paper style={{ flex: 1, overflowY: 'auto', backgroundColor: '#F2F4F7', borderRadius: '8px' }}>
+                    <TableContainer style={{ width: '100%' }}>
+                        <Table stickyHeader style={{ width: '100%' }}>
+                            <TableHead style={{ backgroundColor: '#F7F9FC' }}>
+                                <TableRow>
+                                    <TableCell>Id</TableCell>
+                                    <TableCell style={{ width: '15%' }}> {/* Make "Amount" column larger */}
+                                        Amount
+                                        <TableSortLabel active={sortConfig.key === 'amount'} direction={sortConfig.direction} onClick={() => handleSort('amount')} />
+                                    </TableCell>
+                                    <TableCell>Description</TableCell>
+                                    <TableCell>Type</TableCell>
+                                    <TableCell>Balance</TableCell>
+                                    <TableCell>
+                                        Date
+                                        <TableSortLabel active={sortConfig.key === 'created_at'} direction={sortConfig.direction} onClick={() => handleSort('created_at')} />
+                                    </TableCell>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <div style={{ display: "flex", paddingBottom: "1vh" }}>
-                    <Button disabled={!links.prev} onClick={() => fetchTransactions(links.prev)}>
-                        <i className="fa-solid fa-chevron-left"></i>
-                    </Button>
-                    <Button disabled={!links.next} onClick={() => fetchTransactions(links.next)}>
-                        <i className="fa-solid fa-chevron-right"></i>
-                    </Button>
-                    <Button style={{ marginLeft: 'auto' }} onClick={exportCSV}>
-                        Export CSV
-                    </Button>
-                </div>
-            </Paper>
-        </div>
+                            </TableHead>
+                            <TableBody>
+                                {sortedTransactions.map((tx, index) => (
+                                    <TableRow key={index} style={{ backgroundColor: index % 2 === 0 ? '#FFFFFF' : '#F7F9FC' }}> {/* Alternate colors */}
+                                        <TableCell>{tx.id}</TableCell>
+                                        <TableCell>{tx.amount}</TableCell>
+                                        <TableCell>{tx.description}</TableCell>
+                                        <TableCell>{tx.type}</TableCell>
+                                        <TableCell>{tx.balance_after_transaction}</TableCell>
+                                        <TableCell>{new Date(tx.created_at).toLocaleString()}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <div style={{ display: "flex", paddingBottom: "1vh" }}>
+                        <Button disabled={!links.prev} onClick={() => fetchTransactions(links.prev)}>
+                            <i className="fa-solid fa-chevron-left"></i>
+                        </Button>
+                        <Button disabled={!links.next} onClick={() => fetchTransactions(links.next)}>
+                            <i className="fa-solid fa-chevron-right"></i>
+                        </Button>
+                        <Button style={{ marginLeft: 'auto' }} onClick={exportCSV}>
+                            Export CSV
+                        </Button>
+                    </div>
+                </Paper>
+            </div>
+        </Box>
     );
 }

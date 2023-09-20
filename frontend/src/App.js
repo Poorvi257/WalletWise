@@ -6,14 +6,14 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 const App = () => {
   return (
-    <Container>
+    <div style={{backgroundColor: '#f3f4f6'}}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Main />} />
           <Route path="/wallet-transactions" element={<WalletTransactions />} />
         </Routes>
       </BrowserRouter>
-    </Container>
+    </div>
   );
 };
 

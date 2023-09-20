@@ -112,13 +112,19 @@ module.exports = {
         let connection;
         try {
             connection = await pool.getConnection();
-            if (!connection) throw new HTTPError("Failed to establish a database connection.");
+            if (!connection){
+                return res.status(404).json({ error: 'Failed to establish a database connection.' });
+            } 
 
             const { walletId, page = 1, limit = 10, skip: currentOffset } = req.query;
-            if (!walletId || isNaN(walletId)) throw new HTTPError('Invalid Wallet ID');
+            if (!walletId || isNaN(walletId)){
+                return res.status(404).json({ error: 'Invalid Wallet ID' });
+            }
 
             const intPage = Number(page), intLimit = Number(limit);
-            if (intPage < 1 || intLimit < 1 || intLimit > 1000) throw new HTTPError('Invalid page or limit.');
+            if (intPage < 1 || intLimit < 1 || intLimit > 1000){
+                return res.status(404).json({ error: 'Invalid page or limit.' });
+            }
 
             const userOffset = currentOffset ? JSON.parse(base64Url.decode(currentOffset)) : undefined;
             const skip = userOffset?.nextContinuationToken || (intPage - 1) * intLimit;
@@ -146,8 +152,7 @@ module.exports = {
 
         } catch (err) {
             console.error(err);
-            const status = err instanceof HTTPError ? 400 : 500;
-            res.status(status).json({ message: err.message || "An unknown error has occurred" });
+            res.status(500).json({ error: 'An unknown error has occurred' });
         } finally {
             if (connection) connection.release();
         }

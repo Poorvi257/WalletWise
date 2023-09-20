@@ -57,7 +57,7 @@ export const TransactionsForm = () => {
         else if (desc.trim() === "") {
             alert("Description cannot be empty!");
         }
-        else if (transactionType === "DEBIT" && transaction.balance < amount) {
+        else if (transactionType === "DEBIT" && Number(transaction.balance) < Number(amount)) {
             alert("You dont have enough funds for this transaction!")
         }
         else {
